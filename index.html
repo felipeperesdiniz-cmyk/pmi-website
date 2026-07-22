@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Peakinside Media — Homes, shown the way they feel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preload" as="image" href="hero/exterior.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="hero/interior.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -64,26 +66,38 @@
   .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;}
   .burger span{width:22px;height:1px;background:var(--cream);}
 
-  .hero{
-    position:relative;height:100vh;width:100%;
+  /* ── Hero sequence: one house, one continuous push from drive-up to great room ── */
+  .hero-seq{position:relative;height:200vh;background:#0a0b0d;}
+  .hero-pin{
+    position:sticky;top:0;height:100vh;width:100%;overflow:hidden;
     display:flex;flex-direction:column;justify-content:flex-end;
     padding:0 5% 90px;
-    overflow:hidden;
   }
-  .hero-bg{
+  .hero-layer{
     position:absolute;inset:0;
-    background-image:
-      linear-gradient(180deg, rgba(8,9,11,0.25) 0%, rgba(8,9,11,0.55) 55%, rgba(8,9,11,0.95) 100%),
-      linear-gradient(120deg, rgba(20,30,45,.55), rgba(60,45,20,.35)),
-      url('https://picsum.photos/id/1043/1800/1200');
-    background-size:cover;background-position:center;
-    background-blend-mode:normal, multiply, normal;
-    filter:grayscale(.35) sepia(.18) contrast(1.08) brightness(.62);
-    transform:scale(1.05);
-    animation:heroDrift 18s ease-in-out infinite alternate;
+    background-color:#14161a;background-size:cover;background-position:center;
+    transform-origin:50% 55%;
+    will-change:opacity, transform;backface-visibility:hidden;
   }
-  @keyframes heroDrift{from{transform:scale(1.05) translateY(0);}to{transform:scale(1.12) translateY(-1.5%);}}
-  .hero-content{position:relative;z-index:2;max-width:900px;}
+  .hero-layer--exterior{
+    background-image:url('hero/exterior.jpg');
+    filter:grayscale(.2) sepia(.12) contrast(1.04) brightness(.88);
+  }
+  /* Interior stacks above the exterior and is the only layer that fades — see updateHero(). */
+  .hero-layer--interior{
+    background-image:url('hero/interior.jpg');
+    opacity:0;
+    filter:grayscale(.14) sepia(.07) contrast(1.03) brightness(.92);
+  }
+  .hero-grade{
+    position:absolute;inset:0;
+    background:linear-gradient(180deg, rgba(8,9,11,0.12) 0%, rgba(8,9,11,0.4) 55%, rgba(8,9,11,0.92) 100%);
+  }
+  .hero-vignette{
+    position:absolute;inset:0;
+    background:radial-gradient(ellipse at center, rgba(0,0,0,0) 48%, rgba(0,0,0,.45) 100%);
+  }
+  .hero-content{position:relative;z-index:3;max-width:900px;will-change:opacity, transform;}
   .hero-content .eyebrow{margin-bottom:18px;display:block;}
   .hero-content h1{
     font-size:clamp(40px,6vw,76px);
@@ -94,14 +108,20 @@
   .hero-content p{
     margin-top:22px;max-width:520px;color:var(--muted);font-size:16px;line-height:1.6;
   }
-  .hero-actions{margin-top:34px;display:flex;gap:28px;align-items:center;}
+  .hero-content--interior{
+    position:absolute;left:5%;right:5%;bottom:90px;opacity:0;pointer-events:none;
+  }
+  .hero-content--interior h2{
+    font-size:clamp(30px,4.4vw,56px);font-weight:500;line-height:1.12;
+  }
+  .hero-actions{margin-top:34px;display:flex;gap:28px;align-items:center;flex-wrap:wrap;}
   .btn-solid{
     background:var(--cream);color:#141414;padding:14px 26px;font-size:14px;letter-spacing:.02em;
     border-radius:2px;font-weight:500;
   }
   .btn-ghost{border-bottom:1px solid var(--line);padding-bottom:3px;font-size:14px;color:var(--cream);}
   .scroll-cue{
-    position:absolute;bottom:30px;left:5%;z-index:2;
+    position:absolute;bottom:30px;left:5%;z-index:4;will-change:opacity;
     display:flex;align-items:center;gap:10px;font-size:11px;letter-spacing:.16em;
     text-transform:uppercase;color:var(--muted);
   }
@@ -114,7 +134,7 @@
 
   .scroll-sequence{
     position:relative;
-    height:600vh;
+    height:360vh;
   }
   .sticky-frame{
     position:sticky;top:0;height:100vh;overflow:hidden;
@@ -206,6 +226,17 @@
     .burger{display:flex;}
     .process-grid{grid-template-columns:1fr;}
     .contact-grid{grid-template-columns:1fr;gap:0;}
+    /* Shorter pin on mobile — the whole push resolves in about one and a half swipes. */
+    .hero-seq{height:150vh;}
+    .hero-pin{padding-bottom:70px;}
+    .hero-content--interior{bottom:70px;}
+  }
+
+  /* Reduced motion: no dolly, no parallax — the two frames simply cross-dissolve. */
+  @media(prefers-reduced-motion:reduce){
+    .hero-seq{height:120vh;}
+    .hero-layer{transform:none !important;}
+    .hero-bg,.scroll-cue .line:after{animation:none;}
   }
 </style>
 </head>
@@ -221,68 +252,64 @@
   <div class="burger" id="burger"><span></span><span></span><span></span></div>
 </nav>
 
-<header class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-content">
-    <span class="eyebrow">Cinematic Real Estate Media</span>
-    <h1>Homes, shown<br>the way they <em>feel</em>.</h1>
-    <p>Photography, walkthrough film and aerial coverage for listings that deserve an audience. Scroll to step inside.</p>
-    <div class="hero-actions">
-      <a href="#contact" class="btn-solid">Book a shoot</a>
-      <a href="#services" class="btn-ghost">View services</a>
+<header class="hero-seq" id="heroSeq">
+  <div class="hero-pin">
+    <div class="hero-layer hero-layer--exterior" id="heroExterior" aria-hidden="true"></div>
+    <div class="hero-layer hero-layer--interior" id="heroInterior" aria-hidden="true"></div>
+    <div class="hero-grade"></div>
+    <div class="hero-vignette"></div>
+
+    <div class="hero-content" id="heroCopyOut">
+      <span class="eyebrow">Cinematic Real Estate Media</span>
+      <h1>Homes, shown<br>the way they <em>feel</em>.</h1>
+      <p>One evening at the property, from the drive-up to the last room. Keep scrolling — you're already walking in.</p>
+      <div class="hero-actions">
+        <a href="#contact" class="btn-solid">Book a shoot</a>
+        <a href="#services" class="btn-ghost">View services</a>
+      </div>
     </div>
+
+    <div class="hero-content hero-content--interior" id="heroCopyIn">
+      <span class="eyebrow">Inside the same house</span>
+      <h2>And the door<br>opens on <em>this</em>.</h2>
+      <div class="hero-actions">
+        <a href="#contact" class="btn-solid">Book a shoot</a>
+        <a href="#services" class="btn-ghost">View services</a>
+      </div>
+    </div>
+
+    <div class="scroll-cue" id="scrollCue"><span>Scroll</span><div class="line"></div></div>
   </div>
-  <div class="scroll-cue"><span>Scroll</span><div class="line"></div></div>
 </header>
 
 <div class="scroll-sequence" id="scrollSequence">
   <div class="sticky-frame">
     <div class="scene" data-scene="0">
-      <div class="scene-bg" style="background-image:url('https://picsum.photos/id/1015/1800/1200')"></div>
-      <div class="scene-tint" style="background:linear-gradient(120deg, rgba(20,30,55,.7), rgba(10,10,15,.4))"></div>
-      <div class="scene-vignette"></div>
-      <div class="scene-caption">
-        <span class="eyebrow">01 — The Approach</span>
-        <h2>First, the shape<br>against the sky.</h2>
-        <p>Every listing starts with a single wide frame — the one that makes a buyer stop scrolling.</p>
-      </div>
-    </div>
-    <div class="scene" data-scene="1">
-      <div class="scene-bg" style="background-image:url('https://picsum.photos/id/1039/1800/1200')"></div>
-      <div class="scene-tint" style="background:linear-gradient(120deg, rgba(60,45,20,.55), rgba(10,10,15,.35))"></div>
-      <div class="scene-vignette"></div>
-      <div class="scene-caption">
-        <span class="eyebrow">02 — The Entrance</span>
-        <h2>Then the door<br>opens for them.</h2>
-        <p>We shoot the threshold the way a buyer crosses it — slow, deliberate, lit for the hour.</p>
-      </div>
-    </div>
-    <div class="scene" data-scene="2">
       <div class="scene-bg" style="background-image:url('https://picsum.photos/id/1048/1800/1200')"></div>
       <div class="scene-tint" style="background:linear-gradient(120deg, rgba(40,35,30,.5), rgba(10,10,15,.35))"></div>
       <div class="scene-vignette"></div>
       <div class="scene-caption">
-        <span class="eyebrow">03 — The Living Space</span>
+        <span class="eyebrow">01 — The Living Space</span>
         <h2>Every room,<br>composed like this.</h2>
         <p>Interior sets and HDR stills, framed the way the listing copy will describe them.</p>
       </div>
     </div>
-    <div class="scene" data-scene="3">
+    <div class="scene" data-scene="1">
       <div class="scene-bg" style="background-image:url('https://picsum.photos/id/1060/1800/1200')"></div>
       <div class="scene-tint" style="background:linear-gradient(120deg, rgba(30,40,50,.55), rgba(10,10,15,.35))"></div>
       <div class="scene-vignette"></div>
       <div class="scene-caption">
-        <span class="eyebrow">04 — The Kitchen</span>
+        <span class="eyebrow">02 — The Kitchen</span>
         <h2>Where the light<br>meets the counter.</h2>
         <p>Twilight sets and detail stills — the frames agents reach for first.</p>
       </div>
     </div>
-    <div class="scene" data-scene="4">
+    <div class="scene" data-scene="2">
       <div class="scene-bg" style="background-image:url('https://picsum.photos/id/1053/1800/1200')"></div>
       <div class="scene-tint" style="background:linear-gradient(120deg, rgba(15,45,55,.6), rgba(10,10,15,.4))"></div>
       <div class="scene-vignette"></div>
       <div class="scene-caption">
-        <span class="eyebrow">05 — Water's Edge</span>
+        <span class="eyebrow">03 — Water's Edge</span>
         <h2>And last, the view<br>that closes the deal.</h2>
         <p>Aerial and golden-hour exteriors, from a licensed pilot, cut for web and vertical.</p>
       </div>
@@ -406,9 +433,62 @@
     a.addEventListener('click', function(){ navLinks.classList.remove('open'); });
   });
 
-  window.addEventListener('scroll', function(){
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function clamp01(v){ return v < 0 ? 0 : (v > 1 ? 1 : v); }
+  /* Progress of one element through its own pin distance, 0 → 1. */
+  function pinProgress(el){
+    var total = el.offsetHeight - window.innerHeight;
+    if(total <= 0){ return 0; }
+    return clamp01(-el.getBoundingClientRect().top / total);
+  }
+  /* Remap a sub-range of progress back onto 0 → 1. */
+  function range(p, a, b){ return clamp01((p - a) / (b - a)); }
+  /* Smoothstep — keeps the crossfade from reading as a linear wipe. */
+  function ease(t){ return t * t * (3 - 2 * t); }
+
+  function updateNav(){
     if(window.scrollY > 40){ nav.classList.add('solid'); } else { nav.classList.remove('solid'); }
-  });
+  }
+
+  /* ── Hero: exterior dollies forward, then dissolves into the interior ── */
+  var heroSeq = document.getElementById('heroSeq');
+  var heroExterior = document.getElementById('heroExterior');
+  var heroInterior = document.getElementById('heroInterior');
+  var heroCopyOut = document.getElementById('heroCopyOut');
+  var heroCopyIn = document.getElementById('heroCopyIn');
+  var scrollCue = document.getElementById('scrollCue');
+
+  function updateHero(){
+    var p = pinProgress(heroSeq);
+
+    /* Crossfade sits in the middle third, so each frame gets a beat to hold.
+       Only the interior fades — it sits above the exterior, so dissolving one
+       layer instead of two avoids the luminance dip a true 50/50 blend causes
+       (two half-opaque layers over black cover 75%, and the transition darkens).
+       The exterior only drops out once it is fully hidden, to spare compositing. */
+    var mix = ease(range(p, 0.32, 0.68));
+    heroInterior.style.opacity = String(mix);
+    heroExterior.style.opacity = mix > 0.995 ? '0' : '1';
+
+    if(!reduceMotion){
+      /* Exterior pushes in; interior settles out of its push — one continuous move. */
+      heroExterior.style.transform = 'scale(' + (1 + 0.08 * p) + ')';
+      heroInterior.style.transform = 'scale(' + (1.06 - 0.06 * p) + ')';
+    }
+
+    var outFade = ease(range(p, 0.26, 0.5));
+    heroCopyOut.style.opacity = String(1 - outFade);
+    heroCopyOut.style.pointerEvents = outFade > 0.9 ? 'none' : 'auto';
+    if(!reduceMotion){ heroCopyOut.style.transform = 'translateY(' + (-20 * outFade) + 'px)'; }
+
+    var inFade = ease(range(p, 0.62, 0.84));
+    heroCopyIn.style.opacity = String(inFade);
+    heroCopyIn.style.pointerEvents = inFade > 0.5 ? 'auto' : 'none';
+    if(!reduceMotion){ heroCopyIn.style.transform = 'translateY(' + (18 * (1 - inFade)) + 'px)'; }
+
+    scrollCue.style.opacity = String(1 - ease(range(p, 0.02, 0.18)));
+  }
 
   var seq = document.getElementById('scrollSequence');
   var scenes = Array.prototype.slice.call(document.querySelectorAll('.scene'));
@@ -422,10 +502,7 @@
   var dots = Array.prototype.slice.call(sceneIndex.querySelectorAll('.dot'));
 
   function updateScenes(){
-    var rect = seq.getBoundingClientRect();
-    var totalScroll = seq.offsetHeight - window.innerHeight;
-    var scrolled = Math.min(Math.max(-rect.top, 0), totalScroll);
-    var progress = totalScroll > 0 ? scrolled / totalScroll : 0;
+    var progress = pinProgress(seq);
     var n = scenes.length;
     var pos = progress * (n - 1);
     scenes.forEach(function(scene, i){
@@ -449,9 +526,20 @@
       dot.classList.toggle('active', i === active);
     });
   }
-  window.addEventListener('scroll', updateScenes, { passive: true });
-  window.addEventListener('resize', updateScenes);
-  updateScenes();
+  /* One rAF-coalesced pass for every scroll-driven element on the page. */
+  var ticking = false;
+  function render(){
+    ticking = false;
+    updateNav();
+    updateHero();
+    updateScenes();
+  }
+  function onScroll(){
+    if(!ticking){ ticking = true; window.requestAnimationFrame(render); }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  render();
 
   var io = new IntersectionObserver(function(entries){
     entries.forEach(function(e){
