@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peakinside Media — Homes, shown the way they feel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0b0d;
+    --panel:#12151a;
+    --cream:#f3ede2;
+    --gold:#c9a24d;
+    --muted:#93989f;
+    --line:rgba(243,237,226,0.14);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--cream);
+    font-family:'Inter',sans-serif;
+    font-weight:300;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.serif{font-family:'Playfair Display',serif;}
+  em{font-style:italic;color:var(--gold);}
+  a{color:inherit;text-decoration:none;}
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.18em;
+    font-size:12px;
+    color:var(--gold);
+    font-weight:500;
+  }
+
+  nav{
+    position:fixed;top:0;left:0;width:100%;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:26px 5%;
+    z-index:200;
+    transition:background .4s ease, padding .4s ease, backdrop-filter .4s ease;
+  }
+  nav.solid{
+    background:rgba(10,11,13,0.75);
+    backdrop-filter:blur(10px);
+    padding:16px 5%;
+    border-bottom:1px solid var(--line);
+  }
+  .logo{display:flex;align-items:center;gap:10px;font-size:18px;letter-spacing:.02em;}
+  .logo .mark{
+    width:30px;height:30px;border:1px solid var(--cream);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Playfair Display',serif;font-size:14px;
+  }
+  .logo b{font-weight:600;}
+  .logo span{color:var(--muted);font-weight:300;}
+  .nav-links{display:flex;gap:40px;align-items:center;font-size:14px;color:var(--muted);}
+  .nav-links a:hover{color:var(--cream);}
+  .nav-links .cta{
+    border:1px solid var(--line);padding:10px 18px;border-radius:2px;color:var(--cream);
+  }
+  .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;}
+  .burger span{width:22px;height:1px;background:var(--cream);}
+
+  .hero{
+    position:relative;height:100vh;width:100%;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    padding:0 5% 90px;
+    overflow:hidden;
+  }
+  .hero-bg{
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(180deg, rgba(8,9,11,0.25) 0%, rgba(8,9,11,0.55) 55%, rgba(8,9,11,0.95) 100%),
+      linear-gradient(120deg, rgba(20,30,45,.55), rgba(60,45,20,.35)),
+      url('https://picsum.photos/id/1043/1800/1200');
+    background-size:cover;background-position:center;
+    background-blend-mode:normal, multiply, normal;
+    filter:grayscale(.35) sepia(.18) contrast(1.08) brightness(.62);
+    transform:scale(1.05);
+    animation:heroDrift 18s ease-in-out infinite alternate;
+  }
+  @keyframes heroDrift{from{transform:scale(1.05) translateY(0);}to{transform:scale(1.12) translateY(-1.5%);}}
+  .hero-content{position:relative;z-index:2;max-width:900px;}
+  .hero-content .eyebrow{margin-bottom:18px;display:block;}
+  .hero-content h1{
+    font-size:clamp(40px,6vw,76px);
+    font-weight:600;
+    line-height:1.05;
+    letter-spacing:-.01em;
+  }
+  .hero-content p{
+    margin-top:22px;max-width:520px;color:var(--muted);font-size:16px;line-height:1.6;
+  }
+  .hero-actions{margin-top:34px;display:flex;gap:28px;align-items:center;}
+  .btn-solid{
+    background:var(--cream);color:#141414;padding:14px 26px;font-size:14px;letter-spacing:.02em;
+    border-radius:2px;font-weight:500;
+  }
+  .btn-ghost{border-bottom:1px solid var(--line);padding-bottom:3px;font-size:14px;color:var(--cream);}
+  .scroll-cue{
+    position:absolute;bottom:30px;left:5%;z-index:2;
+    display:flex;align-items:center;gap:10px;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  .scroll-cue .line{width:1px;height:40px;background:var(--line);position:relative;overflow:hidden;}
+  .scroll-cue .line:after{
+    content:'';position:absolute;top:-40px;left:0;width:100%;height:40px;background:var(--gold);
+    animation:cueDrop 1.8s ease-in-out infinite;
+  }
+  @keyframes cueDrop{to{top:40px;}}
+
+  .scroll-sequence{
+    position:relative;
+    height:600vh;
+  }
+  .sticky-frame{
+    position:sticky;top:0;height:100vh;overflow:hidden;
+  }
+  .scene{
+    position:absolute;inset:0;opacity:0;will-change:opacity, transform;
+  }
+  .scene-bg{
+    position:absolute;inset:0;background-size:cover;background-position:center;
+    filter:grayscale(.3) contrast(1.1) brightness(.6);
+  }
+  .scene-tint{position:absolute;inset:0;mix-blend-mode:multiply;}
+  .scene-vignette{
+    position:absolute;inset:0;
+    background:radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,.65) 100%);
+  }
+  .scene-caption{
+    position:absolute;left:6%;bottom:14%;max-width:560px;z-index:3;
+  }
+  .scene-caption .eyebrow{margin-bottom:14px;display:block;}
+  .scene-caption h2{font-size:clamp(28px,4vw,48px);font-weight:500;line-height:1.15;}
+  .scene-caption p{margin-top:16px;color:var(--muted);font-size:15px;line-height:1.7;max-width:460px;}
+  .scene-index{
+    position:absolute;right:6%;bottom:14%;z-index:3;
+    font-family:'Playfair Display',serif;font-size:14px;color:var(--muted);
+    display:flex;flex-direction:column;gap:10px;align-items:flex-end;
+  }
+  .scene-index .dot{width:6px;height:6px;border-radius:50%;background:var(--line);transition:background .3s;}
+  .scene-index .dot.active{background:var(--gold);}
+
+  .reveal-cta{
+    padding:180px 5%;text-align:center;
+    background:linear-gradient(180deg, var(--bg), #0d1013);
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  }
+  .reveal-cta h2{font-size:clamp(32px,5vw,58px);font-weight:500;max-width:820px;margin:0 auto;line-height:1.2;}
+  .reveal-cta p{color:var(--muted);margin:26px auto 0;max-width:520px;}
+  .reveal-cta .btn-solid{margin-top:38px;display:inline-block;}
+
+  .reveal{opacity:0;transform:translateY(40px);transition:opacity .9s ease, transform .9s ease;}
+  .reveal.in{opacity:1;transform:translateY(0);}
+
+  section{position:relative;padding:140px 5%;}
+  .section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:40px;margin-bottom:10px;}
+  .section-head h2{font-size:clamp(30px,4vw,52px);font-weight:500;}
+  .section-head p{color:var(--muted);max-width:420px;font-size:15px;line-height:1.6;}
+
+  .service-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:38px 0;border-bottom:1px solid var(--line);gap:30px;flex-wrap:wrap;
+  }
+  .service-row .num{color:var(--gold);font-size:13px;letter-spacing:.1em;margin-right:24px;}
+  .service-row h3{font-size:26px;font-weight:500;display:inline;}
+  .service-row .desc{color:var(--muted);font-size:14px;margin-top:8px;max-width:460px;}
+  .service-row .price{font-size:14px;color:var(--muted);white-space:nowrap;}
+  .service-left{display:flex;align-items:flex-start;flex-direction:column;flex:1;min-width:260px;}
+  .service-left .title-line{display:flex;align-items:baseline;}
+
+  .process-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:70px;}
+  .process-card{border:1px solid var(--line);padding:34px 28px;border-radius:2px;background:rgba(255,255,255,0.015);}
+  .process-card .num{color:var(--gold);font-size:13px;letter-spacing:.1em;}
+  .process-card h3{margin-top:18px;font-size:21px;font-weight:500;}
+  .process-card p{margin-top:12px;color:var(--muted);font-size:14px;line-height:1.7;}
+
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:60px;}
+  .field{display:flex;flex-direction:column;gap:10px;margin-bottom:34px;}
+  .field label{text-transform:uppercase;font-size:11px;letter-spacing:.14em;color:var(--muted);}
+  .field input,.field textarea{
+    background:transparent;border:none;border-bottom:1px solid var(--line);
+    color:var(--cream);font-family:'Inter',sans-serif;font-size:16px;padding:10px 0;
+  }
+  .field input:focus,.field textarea:focus{outline:none;border-color:var(--gold);}
+  .field textarea{resize:none;height:70px;}
+  .submit-btn{
+    width:100%;background:var(--cream);color:#141414;padding:20px;font-size:15px;
+    display:flex;justify-content:space-between;align-items:center;border:none;cursor:pointer;
+    letter-spacing:.02em;margin-top:10px;
+  }
+  .form-note{margin-top:18px;color:var(--gold);font-size:14px;display:none;}
+
+  footer{
+    padding:50px 5%;display:flex;justify-content:space-between;align-items:center;
+    border-top:1px solid var(--line);color:var(--muted);font-size:13px;flex-wrap:wrap;gap:20px;
+  }
+
+  @media(max-width:820px){
+    .nav-links{position:fixed;top:0;right:-100%;height:100vh;width:70%;background:#0d0f12;flex-direction:column;justify-content:center;transition:right .4s ease;}
+    .nav-links.open{right:0;}
+    .burger{display:flex;}
+    .process-grid{grid-template-columns:1fr;}
+    .contact-grid{grid-template-columns:1fr;gap:0;}
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="logo"><div class="mark">P</div><b>Peakinside</b> <span>Media</span></div>
+  <div class="nav-links" id="navLinks">
+    <a href="#services">Services</a>
+    <a href="#process">Process</a>
+    <a href="#contact" class="cta">Book a shoot</a>
+  </div>
+  <div class="burger" id="burger"><span></span><span></span><span></span></div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <span class="eyebrow">Cinematic Real Estate Media</span>
+    <h1>Homes, shown<br>the way they <em>feel</em>.</h1>
+    <p>Photography, walkthrough film and aerial coverage for listings that deserve an audience. Scroll to step inside.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-solid">Book a shoot</a>
+      <a href="#services" class="btn-ghost">View services</a>
+    </div>
+  </div>
+  <div class="scroll-cue"><span>Scroll</span><div class="line"></div></div>
+</header>
+
+<div class="scroll-sequence" id="scrollSequence">
+  <div class="sticky-frame">
+    <div class="scene" data-scene="0">
+      <div class="scene-bg" style="background-image:url('https://picsum.photos/id/1015/1800/1200')"></div>
+      <div class="scene-tint" style="background:linear-gradient(120deg, rgba(20,30,55,.7), rgba(10,10,15,.4))"></div>
+      <div class="scene-vignette"></div>
+      <div class="scene-caption">
+        <span class="eyebrow">01 — The Approach</span>
+        <h2>First, the shape<br>against the sky.</h2>
+        <p>Every listing starts with a single wide frame — the one that makes a buyer stop scrolling.</p>
+      </div>
+    </div>
+    <div class="scene" data-scene="1">
+      <div class="scene-bg" style="background-image:url('https://picsum.photos/id/1039/1800/1200')"></div>
+      <div class="scene-tint" style="background:linear-gradient(120deg, rgba(60,45,20,.55), rgba(10,10,15,.35))"></div>
+      <div class="scene-vignette"></div>
+      <div class="scene-caption">
+        <span class="eyebrow">02 — The Entrance</span>
+        <h2>Then the door<br>opens for them.</h2>
+        <p>We shoot the threshold the way a buyer crosses it — slow, deliberate, lit for the hour.</p>
+      </div>
+    </div>
+    <div class="scene" data-scene="2">
+      <div class="scene-bg" style="background-image:url('https://picsum.photos/id/1048/1800/1200')"></div>
+      <div class="scene-tint" style="background:linear-gradient(120deg, rgba(40,35,30,.5), rgba(10,10,15,.35))"></div>
+      <div class="scene-vignette"></div>
+      <div class="scene-caption">
+        <span class="eyebrow">03 — The Living Space</span>
+        <h2>Every room,<br>composed like this.</h2>
+        <p>Interior sets and HDR stills, framed the way the listing copy will describe them.</p>
+      </div>
+    </div>
+    <div class="scene" data-scene="3">
+      <div class="scene-bg" style="background-image:url('https://picsum.photos/id/1060/1800/1200')"></div>
+      <div class="scene-tint" style="background:linear-gradient(120deg, rgba(30,40,50,.55), rgba(10,10,15,.35))"></div>
+      <div class="scene-vignette"></div>
+      <div class="scene-caption">
+        <span class="eyebrow">04 — The Kitchen</span>
+        <h2>Where the light<br>meets the counter.</h2>
+        <p>Twilight sets and detail stills — the frames agents reach for first.</p>
+      </div>
+    </div>
+    <div class="scene" data-scene="4">
+      <div class="scene-bg" style="background-image:url('https://picsum.photos/id/1053/1800/1200')"></div>
+      <div class="scene-tint" style="background:linear-gradient(120deg, rgba(15,45,55,.6), rgba(10,10,15,.4))"></div>
+      <div class="scene-vignette"></div>
+      <div class="scene-caption">
+        <span class="eyebrow">05 — Water's Edge</span>
+        <h2>And last, the view<br>that closes the deal.</h2>
+        <p>Aerial and golden-hour exteriors, from a licensed pilot, cut for web and vertical.</p>
+      </div>
+    </div>
+    <div class="scene-index" id="sceneIndex"></div>
+  </div>
+</div>
+
+<section class="reveal-cta reveal">
+  <span class="eyebrow">The showing before the showing</span>
+  <h2 style="margin-top:18px;">A gimbal walkthrough that moves the way a buyer's eye does — cut for web and vertical.</h2>
+  <p>Walkthrough films · 4K gimbal · vertical cuts</p>
+  <a href="#contact" class="btn-solid">See the full walkthrough</a>
+</section>
+
+<section id="services">
+  <div class="section-head reveal">
+    <h2>What we shoot</h2>
+    <p>Four crafts, one evening at the property. Book them alone or as a single visit.</p>
+  </div>
+
+  <div class="service-row reveal">
+    <div class="service-left">
+      <div class="title-line"><span class="num">01</span><h3>Photography</h3></div>
+      <div class="desc">36 edited stills, HDR and a twilight set.</div>
+    </div>
+    <div class="price">from $249</div>
+  </div>
+
+  <div class="service-row reveal">
+    <div class="service-left">
+      <div class="title-line"><span class="num">02</span><h3>Walkthrough films</h3></div>
+      <div class="desc">A gimbal walkthrough, cut for web and vertical.</div>
+    </div>
+    <div class="price">from $349</div>
+  </div>
+
+  <div class="service-row reveal">
+    <div class="service-left">
+      <div class="title-line"><span class="num">03</span><h3>Drone</h3></div>
+      <div class="desc">Aerial stills and 4K film from a licensed pilot.</div>
+    </div>
+    <div class="price">from $299</div>
+  </div>
+
+  <div class="service-row reveal">
+    <div class="service-left">
+      <div class="title-line"><span class="num">04</span><h3>Content creation</h3></div>
+      <div class="desc">Three reels, covers and captions from one visit.</div>
+    </div>
+    <div class="price">from $399</div>
+  </div>
+</section>
+
+<section id="process">
+  <div class="section-head reveal">
+    <h2>One visit, every deliverable</h2>
+    <p>You schedule a single evening. We arrive before golden hour, walk the house the way a buyer would, and leave with everything the listing needs.</p>
+  </div>
+  <div class="process-grid">
+    <div class="process-card reveal">
+      <span class="num">01</span>
+      <h3>Before golden hour</h3>
+      <p>We arrive early to plan the light, the angles and the walk-through route through the house.</p>
+    </div>
+    <div class="process-card reveal">
+      <span class="num">02</span>
+      <h3>One evening, every craft</h3>
+      <p>Stills, gimbal film, drone and social cuts — captured in a single visit, no repeat trips.</p>
+    </div>
+    <div class="process-card reveal">
+      <span class="num">03</span>
+      <h3>Everything lands fast</h3>
+      <p>See your listing inside 72 hours. One link, ready to post, print or share with the seller.</p>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="section-head reveal">
+    <h2>Book a shoot</h2>
+    <p>Tell us about the property. We reply within one business day with a date and a plan for the light.</p>
+  </div>
+  <span class="eyebrow reveal" style="display:block;margin-top:30px;">Evening slots · limited per week · travel on request</span>
+
+  <form class="contact-grid reveal" id="bookingForm">
+    <div class="field">
+      <label>Name</label>
+      <input type="text" placeholder="Your name" required>
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" placeholder="you@company.com" required>
+    </div>
+    <div class="field" style="grid-column:1/-1;">
+      <label>Property address</label>
+      <input type="text" placeholder="Street, city">
+    </div>
+    <div class="field" style="grid-column:1/-1;">
+      <label>Anything we should know</label>
+      <textarea placeholder="Listing date, square footage, what matters most"></textarea>
+    </div>
+    <div style="grid-column:1/-1;">
+      <button type="submit" class="submit-btn"><span>Send inquiry</span><span>→</span></button>
+      <div class="form-note" id="formNote">Thanks — we typically reply within one business day.</div>
+    </div>
+  </form>
+</section>
+
+<footer>
+  <div class="logo"><div class="mark">P</div>Real estate media, shot at golden hour.</div>
+  <div>© 2026 Peakinside Media</div>
+</footer>
+
+<script>
+  var nav = document.getElementById('nav');
+  var burger = document.getElementById('burger');
+  var navLinks = document.getElementById('navLinks');
+  burger.addEventListener('click', function(){ navLinks.classList.toggle('open'); });
+  navLinks.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ navLinks.classList.remove('open'); });
+  });
+
+  window.addEventListener('scroll', function(){
+    if(window.scrollY > 40){ nav.classList.add('solid'); } else { nav.classList.remove('solid'); }
+  });
+
+  var seq = document.getElementById('scrollSequence');
+  var scenes = Array.prototype.slice.call(document.querySelectorAll('.scene'));
+  var sceneIndex = document.getElementById('sceneIndex');
+  scenes.forEach(function(s, i){
+    var dot = document.createElement('div');
+    dot.className = 'dot';
+    dot.setAttribute('data-i', String(i));
+    sceneIndex.appendChild(dot);
+  });
+  var dots = Array.prototype.slice.call(sceneIndex.querySelectorAll('.dot'));
+
+  function updateScenes(){
+    var rect = seq.getBoundingClientRect();
+    var totalScroll = seq.offsetHeight - window.innerHeight;
+    var scrolled = Math.min(Math.max(-rect.top, 0), totalScroll);
+    var progress = totalScroll > 0 ? scrolled / totalScroll : 0;
+    var n = scenes.length;
+    var pos = progress * (n - 1);
+    scenes.forEach(function(scene, i){
+      var d = pos - i;
+      var absd = Math.abs(d);
+      var opacity = 1 - Math.min(absd, 1);
+      scene.style.opacity = String(opacity);
+      var ty = (1 - opacity) * 26;
+      var scale = 1 + (1 - opacity) * 0.04;
+      scene.style.transform = 'translateY(' + ty + 'px) scale(' + scale + ')';
+      scene.style.zIndex = String(100 - Math.round(absd * 10));
+      var cap = scene.querySelector('.scene-caption');
+      if(cap){
+        var capOpacity = Math.max(0, 1 - absd * 2.6);
+        cap.style.opacity = String(capOpacity);
+        cap.style.transform = 'translateY(' + ((1 - capOpacity) * 18) + 'px)';
+      }
+    });
+    var active = Math.round(pos);
+    dots.forEach(function(dot, i){
+      dot.classList.toggle('active', i === active);
+    });
+  }
+  window.addEventListener('scroll', updateScenes, { passive: true });
+  window.addEventListener('resize', updateScenes);
+  updateScenes();
+
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('in'); }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+
+  var form = document.getElementById('bookingForm');
+  var formNote = document.getElementById('formNote');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    formNote.style.display = 'block';
+    form.reset();
+  });
+</script>
+</body>
+</html>
